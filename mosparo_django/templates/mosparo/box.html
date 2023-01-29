@@ -1,0 +1,8 @@
+<div id="mosparo-box-{{ widget_uuid }}"></div>
+
+<script src="{{ mosparo_host }}/build/mosparo-frontend.js" defer></script>
+<script>
+    window.onload = function(){
+        new mosparo('mosparo-box-{{ widget_uuid }}', '{{ mosparo_host }}', '{{ mosparo_uuid }}', '{{ mosparo_public_key }}', {loadCssResource: true});
+    };
+</script>

@@ -12,7 +12,7 @@
 
 -----
 
-## IMPORTANT: This is a very early alpha version. Please do not use it in production and send feedback as an issue or by email to feedback@mosparo.io.
+### IMPORTANT: This is a very early alpha version. Please do not use it in production and send feedback as an issue or by email to feedback@mosparo.io.
 
 ## Description
 With this Django app, you can protect your forms with mosparo. Install the app, configure it and add the field to your forms.
@@ -93,17 +93,30 @@ from mosparo_django.fields import MosparoField
 
 class Form(forms.Form):
     # Your other fields...
-    mosparo_field = MosparoField(label='Spam protection')
+    mosparo = MosparoField(label='Spam protection')
 
     def clean(self):
-        self.mosparo_field.verify_data(self)
+        self.mosparo.verify_data(self)
     
         return super().clean()
 ```
 
 **Important: No spam protection will happen if you do not use one of these two things.**
 
+### Specify the connection details on the field
+
+You can also specify the connection details on the field. For that, please add the field to your form and specify the connection settings by setting the parameters `mosparo_host`, `mosparo_uuid`, `mosparo_public_key`, `mosparo_private_key`, and `mosparo_verify_ssl`. If you want to change the UUID, public or private key, you have to specify all these three values because these depend on the project and if you want to connect the field to a different project, all three values will be different.
+
+```python
+from mosparo_django.forms import MosparoForm
+from mosparo_django.fields import MosparoField
+
+class Form(MosparoForm):
+    # Your other fields...
+    mosparo = MosparoField(label='Spam protection', mosparo_uuid='123', mosparo_public_key='test_key', mosparo_private_key = 'private_key')
+```
+
 ## License
 
-mosparo Python API Client is open-sourced software licensed under the [MIT License](https://opensource.org/licenses/MIT).
+mosparo Integration for Django is open-sourced software licensed under the [MIT License](https://opensource.org/licenses/MIT).
 Please see the [LICENSE](LICENSE) file for the full license.

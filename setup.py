@@ -38,9 +38,9 @@ setup(
     ],
     packages=find_packages(),
     install_requires=['mosparo', 'Django>=3.2'],
-    setup_requires=['pytest-runner'],
+    setup_requires=['pytest-runner', 'requests-mock', 'pytest-django'],
     tests_require=['pytest'],
     test_suite='tests',
     include_package_data=True,
-    python_requires='>=3.6',
+    python_requires='>=3.5',
 )

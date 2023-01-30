@@ -1,6 +1,7 @@
 from django.forms import Form, Widget, CharField
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 import pytest
+from django.http import QueryDict
 
 from mosparo import RequestHelper, VerificationResult
 
@@ -53,11 +54,9 @@ def test_mosparo_field_verify_data(requests_mock):
     class DummyForm(Form):
         name = CharField(label='Name', max_length=255)
 
-    form = DummyForm(data={
-        'name': 'Test',
-        '_mosparo_submitToken': 'submitToken',
-        '_mosparo_validationToken': 'validationToken'
-    })
+    data = QueryDict('name=Test&_mosparo_submitToken=submitToken&_mosparo_validationToken=validationToken')
+    form = DummyForm(data=data)
+
     form.is_valid()
 
     # Prepare the API request
@@ -90,11 +89,9 @@ def test_mosparo_field_verify_data_validation_error(requests_mock):
     class DummyForm(Form):
         name = CharField(label='Name', max_length=255)
 
-    form = DummyForm(data={
-        'name': 'Test',
-        '_mosparo_submitToken': 'submitToken',
-        '_mosparo_validationToken': 'validationToken'
-    })
+    data = QueryDict('name=Test&_mosparo_submitToken=submitToken&_mosparo_validationToken=validationToken')
+    form = DummyForm(data=data)
+
     form.is_valid()
 
     # Prepare the API request
@@ -122,4 +119,6 @@ def test_mosparo_field_verify_data_validation_error(requests_mock):
 
     with pytest.raises(ValidationError) as exc:
         mf.verify_data(form)
+
+    assert 'mosparo could not verify the data. Please check the submission in mosparo.' in str(exc.value)
 

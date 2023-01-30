@@ -62,7 +62,7 @@ class MosparoField(forms.BooleanField):
         submit_token = form.data['_mosparo_submitToken']
         validation_token = form.data['_mosparo_validationToken']
 
-        res = api_client.verify_submission(form.cleaned_data, submit_token, validation_token)
+        res = api_client.verify_submission(form.data.dict(), submit_token, validation_token)
 
         if not res.is_submittable():
             form.valid = False

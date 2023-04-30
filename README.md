@@ -114,6 +114,25 @@ class Form(MosparoForm):
     mosparo = MosparoField(label='Spam protection', mosparo_uuid='123', mosparo_public_key='test_key', mosparo_private_key = 'private_key')
 ```
 
+### Filter the field types and form data
+
+The MosparoField offers some callback methods to adjust the behavior of the field.
+
+```python
+from mosparo_django.forms import MosparoForm
+from mosparo_django.fields import MosparoField
+
+class Form(MosparoForm):
+    # Your other fields...
+    mosparo = MosparoField(callback_ignored_field_types=None, callback_verifiable_field_types=None, callback_after_prepare_form_data=None)
+```
+
+| Argument name                      | Description                                                                                                                                          |
+|------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `callback_ignored_field_types`     | Gets and returns a list of class names of field types, which should be ignored (Example: `PasswordInput`)                                            |
+| `callback_verifiable_field_types`  | Gets and returns a list of class names of field types, which are verifiable (Example: `TextInput`)                                                   |
+| `callback_after_prepare_form_data` | Gets the dict with all prepared form data, the required field names, and the verifiable field names as argument and expects the same to be returned. |
+
 ## License
 
 mosparo Integration for Django is open-sourced software licensed under the [MIT License](https://opensource.org/licenses/MIT).

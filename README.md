@@ -27,13 +27,16 @@ pip install mosparo_django
 
 ### Build from source
 
-1. Build the package
+You need the module `build` to build the module from source.
+
+1. Clone the repository
+2. Build the package
 ```commandline
-python setup.py bdist_wheel 
+python -m build
 ```
-2. Install the package
+3. Install the package
 ```commandline
-pip install dist/mosparo_django-1.0.0-py3-none-any.whl
+pip install dist/mosparo_django-1.0.0b1-py3-none-any.whl
 ```
 
 ## Usage

@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mosparo_django"
+version = "1.0.0b1"
+description = "A Django app to integrate mosparo into your forms."
+readme = "README.md"
+authors = [{ name = "mosparo Core Developers", email = "info@mosparo.io" }]
+license = { file = "LICENSE" }
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Framework :: Django :: 3.2",
+    "Framework :: Django :: 4",
+    "Framework :: Django :: 4.0",
+    "Framework :: Django :: 4.1",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Internet",
+    "Topic :: Internet :: WWW/HTTP",
+]
+keywords = ["mosparo", "spam-protection", "accessibility", "captcha", "django", "app"]
+dependencies = [
+    "mosparo_api_client", 
+    "Django>=3.2"
+]
+requires-python = ">=3.6"
+
+[project.optional-dependencies]
+dev = ["pytest-runner", "requests-mock", "pytest-django"]
+
+[project.urls]
+Website = "https://mosparo.io"
+GitHub = "https://github.com/mosparo/django-integration"

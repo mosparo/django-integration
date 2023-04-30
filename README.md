@@ -12,8 +12,6 @@
 
 -----
 
-### IMPORTANT: This is a very early alpha version. Please do not use it in production and send feedback as an issue or by email to feedback@mosparo.io.
-
 ## Description
 With this Django app, you can protect your forms with mosparo. Install the app, configure it and add the field to your forms.
 

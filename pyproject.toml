@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mosparo_django"
-version = "1.0.0b1"
+version = "1.0.0b2"
 description = "A Django app to integrate mosparo into your forms."
 readme = "README.md"
 authors = [{ name = "mosparo Core Developers", email = "info@mosparo.io" }]
@@ -31,7 +31,7 @@ classifiers = [
 ]
 keywords = ["mosparo", "spam-protection", "accessibility", "captcha", "django", "app"]
 dependencies = [
-    "mosparo_api_client", 
+    "mosparo_api_client>=1.0.1",
     "Django>=3.2"
 ]
 requires-python = ">=3.6"

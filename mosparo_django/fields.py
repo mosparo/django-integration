@@ -54,6 +54,9 @@ class MosparoField(forms.BooleanField):
         frontend_config = FrontendConfig(self.mosparo_host, self.mosparo_uuid, self.mosparo_public_key)
         self.widget.set_frontend_config(frontend_config)
 
+        # Hide the label for the field, important for the invisible mode.
+        self.label = ''
+
     def validate(self, value):
         return True
 

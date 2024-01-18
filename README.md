@@ -13,7 +13,16 @@
 -----
 
 ## Description
+
 With this Django app, you can protect your forms with mosparo. Install the app, configure it and add the field to your forms.
+
+## How to use
+
+Please see our [How to use](https://mosparo.io/how-to-use/) introduction on our website to learn how to use mosparo in your form.
+
+In step 3 of the how-to-use explanation, you must integrate mosparo into your website. Please follow the [Installation](#installation) part below for this process.
+
+In step 4 of the how-to-use explanation, you must connect your website with your mosparo project. Please follow the [Usage](#usage) part below.
 
 ## Installation
 
@@ -40,6 +49,7 @@ pip install dist/mosparo_django-1.0.0b1-py3-none-any.whl
 ```
 
 ## Usage
+
 1. Create a project in your mosparo installation
 2. Edit the `settings.py` file of your project
 2. Add the mosparo integration to the list of enabled apps:

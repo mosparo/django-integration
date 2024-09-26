@@ -102,6 +102,7 @@ class MosparoField(forms.BooleanField):
     def prepare_form_data(self, form: forms.Form):
         data = { 'form_data': {}, 'required_fields': [], 'verifiable_fields': [] }
         ignored_field_types = [
+            'BooleanField',
             'PasswordInput',
             'HiddenInput',
             'MultipleHiddenInput',

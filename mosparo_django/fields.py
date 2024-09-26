@@ -103,6 +103,10 @@ class MosparoField(forms.BooleanField):
         data = { 'form_data': {}, 'required_fields': [], 'verifiable_fields': [] }
         ignored_field_types = [
             'BooleanField',
+            'NullBooleanSelect',
+            'CheckboxInput',
+            'RadioSelect',
+            'CheckboxSelectMultiple',
             'PasswordInput',
             'HiddenInput',
             'MultipleHiddenInput',

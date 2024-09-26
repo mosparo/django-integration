@@ -45,7 +45,7 @@ python -m build
 ```
 3. Install the package
 ```commandline
-pip install dist/mosparo_django-1.0.1-py3-none-any.whl
+pip install dist/mosparo_django-1.0.2-py3-none-any.whl
 ```
 
 ## Usage

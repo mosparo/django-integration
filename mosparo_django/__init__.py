@@ -2,7 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 __project__ = 'mosparo_django'
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 settings_types = {
     'MOSPARO_HOST': str,

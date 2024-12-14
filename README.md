@@ -107,7 +107,7 @@ class Form(forms.Form):
     mosparo = MosparoField(label='Spam protection')
 
     def clean(self):
-        self.mosparo.verify_data(self)
+        self.fields['mosparo'].verify_data(self)
     
         return super().clean()
 ```

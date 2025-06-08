@@ -19,4 +19,4 @@ for setting, type in settings_types.items():
         raise ImproperlyConfigured('Setting "%s" is not defined.' % setting)
 
     if hasattr(settings, setting) and not isinstance(getattr(settings, setting), type):
-        raise ImproperlyConfigured('Type of Setting "%s" is not correct. Should be "%s".' % setting, type)
+        raise ImproperlyConfigured('Type of Setting "%s" is not correct. Should be "%s".' % (setting, type))

@@ -1,6 +1,7 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.utils.translation import gettext_lazy as _
 
 from mosparo_api_client import Client
 from mosparo_django.config import FrontendConfig
@@ -69,7 +70,7 @@ class MosparoField(forms.BooleanField):
         )
 
         if '_mosparo_submitToken' not in form.data or '_mosparo_validationToken' not in form.data:
-            raise ValidationError('mosparo specific fields were not found in the submitted data.')
+            raise ValidationError(_('mosparo specific fields were not found in the submitted data.'))
 
         data = self.prepare_form_data(form)
         submit_token = form.data['_mosparo_submitToken']
@@ -88,7 +89,7 @@ class MosparoField(forms.BooleanField):
                 return
 
         form.valid = False
-        raise ValidationError('mosparo could not verify the data. Please check the submission in mosparo.')
+        raise ValidationError(_('mosparo could not verify the data. Please check the submission in mosparo.'))
 
     def get_mosparo_host(self):
         return self.mosparo_host

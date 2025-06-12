@@ -1,0 +1,29 @@
+# Copyright (C) 2025 Matthias Zobrist <info@mosparo.io>
+# This file is distributed under the same license as the PACKAGE package.
+# Matthias Zobrist <info@mosparo.io>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mosparo_django 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-11 19:23+0200\n"
+"PO-Revision-Date: 2025-06-11 19:26+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+
+#: fields.py:73
+msgid "mosparo specific fields were not found in the submitted data."
+msgstr ""
+
+#: fields.py:92
+msgid "mosparo could not verify the data. Please check the submission in mosparo."
+msgstr ""
+
+#: forms.py:16
+msgid "No mosparo field found in form."
+msgstr ""

@@ -1,0 +1,31 @@
+# Copyright (C) 2025 Matthias Zobrist <info@mosparo.io>
+# This file is distributed under the same license as the PACKAGE package.
+# Matthias Zobrist <info@mosparo.io>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: mosparo_django 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-06-11 19:23+0200\n"
+"PO-Revision-Date: 2025-06-12 17:49+0000\n"
+"Last-Translator: Matthias Zobrist <matthias.zobrist@zepi.net>\n"
+"Language-Team: Turkish <https://hosted.weblate.org/projects/mosparo/"
+"integration_django/tr/>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.12-dev\n"
+
+#: fields.py:73
+msgid "mosparo specific fields were not found in the submitted data."
+msgstr "Gönderme belirteci yok. Bu formun doğrulanması mümkün değildir."
+
+#: fields.py:92
+msgid "mosparo could not verify the data. Please check the submission in mosparo."
+msgstr "Veriniz spam korumamız tarafından yakalandı."
+
+#: forms.py:16
+msgid "No mosparo field found in form."
+msgstr "Formda mosparo alanı bulunamadı."

@@ -150,3 +150,11 @@ class Form(MosparoForm):
 
 mosparo Integration for Django is open-sourced software licensed under the [MIT License](https://opensource.org/licenses/MIT).
 Please see the [LICENSE](LICENSE) file for the full license.
+
+## Contributing
+
+### Translate mosparo Integration for Django
+
+We're using [Weblate](https://weblate.org/) to translate the mosparo Integration for Django. If you want to help translate the mosparo Integration for Django, please head over to our Weblate project: https://hosted.weblate.org/projects/mosparo/integration_django/
+
+Thank you for helping to make the mosparo Integration for Django better.

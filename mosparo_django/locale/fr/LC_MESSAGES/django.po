@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: mosparo_django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-06-11 19:23+0200\n"
-"PO-Revision-Date: 2025-06-13 19:02+0000\n"
-"Last-Translator: Matthias Zobrist <matthias.zobrist@zepi.net>\n"
+"PO-Revision-Date: 2025-10-31 23:42+0000\n"
+"Last-Translator: Bamowen <mathieu.monsauret@gmail.com>\n"
 "Language-Team: French <https://hosted.weblate.org/projects/mosparo/"
 "integration_django/fr/>\n"
 "Language: fr\n"
@@ -16,20 +16,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.12-dev\n"
+"X-Generator: Weblate 5.14.1-dev\n"
 
 #: fields.py:73
-#, fuzzy
 msgid "mosparo specific fields were not found in the submitted data."
 msgstr ""
-"Aucun jeton de soumission disponible. Impossible de valider ce formulaire."
+"Aucun champ spécifique à mosparo n'a été trouvé dans les données soumises."
 
 #: fields.py:92
-#, fuzzy
 msgid "mosparo could not verify the data. Please check the submission in mosparo."
-msgstr "Vos données ont été interceptées par notre protection anti-spam."
+msgstr ""
+"mosparo n'a pas pu vérifier les données. Veuillez vérifier cette entrée dans "
+"mosparo."
 
 #: forms.py:16
-#, fuzzy
 msgid "No mosparo field found in form."
 msgstr "Aucun champ mosparo n'a été trouvé dans le formulaire."

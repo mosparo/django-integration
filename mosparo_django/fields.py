@@ -78,7 +78,7 @@ class MosparoField(forms.BooleanField):
 
         res = api_client.verify_submission(data['form_data'], submit_token, validation_token)
 
-        if res != None:
+        if res is not None:
             verified_fields = res.get_verified_fields()
             required_field_difference = set(data['required_fields']) - set(verified_fields.keys())
             verifiable_field_difference = set(data['verifiable_fields']) - set(verified_fields.keys())
@@ -115,7 +115,7 @@ class MosparoField(forms.BooleanField):
             'ClearableFileInput',
             'MosparoField',
         ]
-        if self.callback_ignored_field_types != None:
+        if self.callback_ignored_field_types is not None:
             ignored_field_types = self.callback_ignored_field_types(ignored_field_types)
         
         verifiable_field_types = [
@@ -124,7 +124,7 @@ class MosparoField(forms.BooleanField):
             'EmailInput',
             'URLInput',
         ]
-        if self.callback_verifiable_field_types != None:
+        if self.callback_verifiable_field_types is not None:
             verifiable_field_types = self.callback_verifiable_field_types(verifiable_field_types)
 
         for key, field in form.fields.items():
@@ -142,7 +142,7 @@ class MosparoField(forms.BooleanField):
             if key in form.data:
                 data['form_data'][key] = form.data[key]
 
-        if self.callback_after_prepare_form_data != None:
+        if self.callback_after_prepare_form_data is not None:
             data = self.callback_after_prepare_form_data(data)
 
         return data

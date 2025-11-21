@@ -1,8 +1,19 @@
 <div id="mosparo-box-{{ widget_uuid }}"></div>
-
-<script src="{{ mosparo_host }}/build/mosparo-frontend.js" defer></script>
 <script>
-    window.onload = function(){
-        new mosparo('mosparo-box-{{ widget_uuid }}', '{{ mosparo_host }}', '{{ mosparo_uuid }}', '{{ mosparo_public_key }}', {loadCssResource: true});
-    };
+  (function() {
+    function init() {
+      new mosparo("mosparo-box-{{ widget_uuid }}", "{{ mosparo_host }}", "{{ mosparo_uuid }}", "{{ mosparo_public_key }}", {loadCssResource: true});
+    }
+
+    if (typeof mosparo === "undefined") {
+      const el = document.createElement("script")
+      el.setAttribute("src", "{{ mosparo_host }}/build/mosparo-frontend.js")
+      el.addEventListener("load", init)
+      document.body.append(el)
+    } else if (document.readyState !== "loading") {
+      init()
+    } else {
+      document.addEventListener("DOMContentLoaded", init)
+    }
+  })()
 </script>

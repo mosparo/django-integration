@@ -4,21 +4,21 @@
 #
 #    pip-compile pyproject.toml
 #
-asgiref==3.6.0
+asgiref>=3.6.0
     # via django
 certifi>=2023.7.22
     # via requests
-charset-normalizer==3.1.0
+charset-normalizer>=3.1.0
     # via requests
 django>=3.2
     # via mosparo-django (pyproject.toml)
-idna==3.7
+idna>=2.5,<4
     # via requests
-mosparo-api-client==1.0.1
+mosparo-api-client>=1.1.2
     # via mosparo-django (pyproject.toml)
-requests==2.32.3
+requests==2.32.5
     # via mosparo-api-client
 sqlparse==0.5.0
     # via django
-urllib3==2.2.2
+urllib3>=2.5.0,<3
     # via requests

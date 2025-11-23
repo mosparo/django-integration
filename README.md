@@ -108,7 +108,7 @@ class Form(forms.Form):
 
     def clean(self):
         self.fields['mosparo'].verify_data(self)
-    
+
         return super().clean()
 ```
 

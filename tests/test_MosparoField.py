@@ -33,7 +33,7 @@ def test_mosparo_field_custom_widget():
         widget = Widget
 
     with pytest.raises(ImproperlyConfigured) as exc:
-        mf = CustomMosparoField()
+        CustomMosparoField()
 
     assert 'The widget must be a subclass of mosparo_django.widgets.MosparoWidget' in str(exc.value)
 

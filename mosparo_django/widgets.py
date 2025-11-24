@@ -4,8 +4,9 @@ from django.forms import widgets
 
 from mosparo_django.config import FrontendConfig
 
+
 class MosparoWidget(widgets.Widget):
-    template_name = 'mosparo/box.html'
+    template_name = "mosparo/box.html"
 
     frontend_config = None
 
@@ -21,10 +22,10 @@ class MosparoWidget(widgets.Widget):
         context = super().get_context(name, value, attrs)
         context.update(
             {
-                'widget_uuid': self.uuid,
-                'mosparo_host': self.frontend_config.get_host(),
-                'mosparo_uuid': self.frontend_config.get_uuid(),
-                'mosparo_public_key': self.frontend_config.get_public_key()
+                "widget_uuid": self.uuid,
+                "mosparo_host": self.frontend_config.get_host(),
+                "mosparo_uuid": self.frontend_config.get_uuid(),
+                "mosparo_public_key": self.frontend_config.get_public_key(),
             }
         )
         return context

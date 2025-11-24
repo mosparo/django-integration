@@ -1,47 +1,46 @@
 [build-system]
-requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+requires = [ "setuptools", "wheel" ]
 
 [project]
-name = "mosparo_django"
+name = "mosparo-django"
 version = "1.0.6"
 description = "A Django app to integrate mosparo into your forms."
 readme = "README.md"
-authors = [{ name = "mosparo Core Developers", email = "info@mosparo.io" }]
+keywords = [ "accessibility", "app", "captcha", "django", "mosparo", "spam-protection" ]
 license = "MIT"
 license-files = [ "LICENSE" ]
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Environment :: Web Environment",
-    "Framework :: Django :: 3.2",
-    "Framework :: Django :: 4",
-    "Framework :: Django :: 4.2",
-    "Framework :: Django :: 5.0",
-    "Framework :: Django :: 5.1",
-    "Framework :: Django :: 5.2",
-    "Intended Audience :: Developers",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Topic :: Internet",
-    "Topic :: Internet :: WWW/HTTP",
-]
-keywords = ["mosparo", "spam-protection", "accessibility", "captcha", "django", "app"]
-dependencies = [
-    "mosparo_api_client>=1.1.0",
-    "Django>=3.2"
-]
+authors = [ { name = "mosparo Core Developers", email = "info@mosparo.io" } ]
 requires-python = ">=3.6"
 
-[project.optional-dependencies]
-dev = ["pytest-runner", "requests-mock", "pytest-django"]
-
-[project.urls]
-Website = "https://mosparo.io"
-GitHub = "https://github.com/mosparo/django-integration"
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: Web Environment",
+  "Framework :: Django :: 3.2",
+  "Framework :: Django :: 4",
+  "Framework :: Django :: 4.2",
+  "Framework :: Django :: 5.0",
+  "Framework :: Django :: 5.1",
+  "Framework :: Django :: 5.2",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Internet",
+  "Topic :: Internet :: WWW/HTTP",
+]
+dependencies = [
+  "django>=3.2",
+  "mosparo-api-client>=1.1",
+]
+optional-dependencies.dev = [ "pytest-django", "pytest-runner", "requests-mock" ]
+urls.GitHub = "https://github.com/mosparo/django-integration"
+urls.Website = "https://mosparo.io"

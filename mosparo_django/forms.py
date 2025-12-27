@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .fields import MosparoField
 
+
 class MosparoForm(forms.Form):
     def clean(self):
         mosparo_field = None
@@ -13,7 +14,7 @@ class MosparoForm(forms.Form):
                 break
 
         if mosparo_field is None:
-            raise ValidationError(_('No mosparo field found in form.'))
+            raise ValidationError(_("No mosparo field found in form."))
 
         mosparo_field.verify_data(self)
 

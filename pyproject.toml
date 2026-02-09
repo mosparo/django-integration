@@ -12,7 +12,6 @@ license = "MIT"
 license-files = [ "LICENSE" ]
 authors = [ { name = "mosparo Core Developers", email = "info@mosparo.io" } ]
 requires-python = ">=3.6"
-
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Environment :: Web Environment",

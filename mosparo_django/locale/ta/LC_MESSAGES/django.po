@@ -7,23 +7,26 @@ msgstr ""
 "Project-Id-Version: mosparo_django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-06-11 19:23+0200\n"
-"PO-Revision-Date: 2025-06-11 19:26+0200\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2026-03-10 13:09+0000\n"
+"Last-Translator: தமிழ்நேரம் <tamilneram247@gmail.com>\n"
+"Language-Team: Tamil <https://hosted.weblate.org/projects/mosparo/"
+"integration_django/ta/>\n"
 "Language: ta\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.17-dev\n"
 
 #: fields.py:73
 msgid "mosparo specific fields were not found in the submitted data."
-msgstr ""
+msgstr "சமர்ப்பிக்கப்பட்ட தரவுகளில் mosparo குறிப்பிட்ட புலங்கள் காணப்படவில்லை."
 
 #: fields.py:92
 msgid "mosparo could not verify the data. Please check the submission in mosparo."
 msgstr ""
+"mosparo தரவை சரிபார்க்க முடியவில்லை. மோச்பரோவில் சமர்ப்பிப்பைச் சரிபார்க்கவும்."
 
 #: forms.py:16
 msgid "No mosparo field found in form."
-msgstr ""
+msgstr "வடிவில் மோச்பரோ புலம் இல்லை."

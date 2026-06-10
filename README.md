@@ -157,4 +157,17 @@ Please see the [LICENSE](LICENSE) file for the full license.
 
 We're using [Weblate](https://weblate.org/) to translate the mosparo Integration for Django. If you want to help translate the mosparo Integration for Django, please head over to our Weblate project: https://hosted.weblate.org/projects/mosparo/integration_django/
 
+#### List of translators
+
+| Language  | Language Code | Contributors                                                |
+|-----------|---------------|-------------------------------------------------------------|
+| German    | de            | mosparo Core Developers                                     |
+| Estonian  | et            | [jrthwlate](https://hosted.weblate.org/user/jrthwlate/)     |
+| French    | fr            | [Bamowen](https://hosted.weblate.org/user/Bamowen/)         |
+| Croatian  | hr            | [milotype](https://hosted.weblate.org/user/milotype/)       |
+| Korean    | ko            | [MarongHappy](https://hosted.weblate.org/user/MarongHappy/) |
+| Tamil     | ta            | [TamilNeram](https://hosted.weblate.org/user/TamilNeram/)   |
+| Turkish   | tr            | mosparo Core Developers                                     |
+| Ukrainian | uk            | [kefir2105](https://hosted.weblate.org/user/kefir2105/)     |
+
 Thank you for helping to make the mosparo Integration for Django better.

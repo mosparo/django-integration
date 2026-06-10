@@ -4,7 +4,7 @@ requires = [ "setuptools", "wheel" ]
 
 [project]
 name = "mosparo-django"
-version = "1.0.7"
+version = "1.0.8"
 description = "A Django app to integrate mosparo into your forms."
 readme = "README.md"
 keywords = [ "accessibility", "app", "captcha", "django", "mosparo", "spam-protection" ]

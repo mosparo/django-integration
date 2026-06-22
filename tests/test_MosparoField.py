@@ -107,6 +107,51 @@ def test_mosparo_field_verify_data(requests_mock):
     mf.verify_data(form)
 
 
+def test_mosparo_field_verify_data_with_ignored_field(requests_mock):
+    # Prepare the form
+    class DummyForm(Form):
+        name = CharField(label="Name", max_length=255)
+        email = CharField(label="Email", max_length=255, widget=TextInput(attrs={"class": "mosparo__ignored-field"}))
+        password = CharField(label="Password", max_length=255, widget=PasswordInput)
+
+    data = QueryDict(
+        "name=Test&email=test@example.com&_mosparo_submitToken=submitToken&_mosparo_validationToken=validationToken"
+    )
+    form = DummyForm(data=data)
+
+    form.is_valid()
+
+    # Prepare the API request
+    public_key = "public_key"
+    private_key = "private_key"
+    validation_token = "validationToken"
+    form_data = {"name": "Test"}
+
+    request_helper = RequestHelper(public_key, private_key)
+
+    prepared_form_data = request_helper.prepare_form_data(form_data)
+    form_signature = request_helper.create_form_data_hmac_hash(prepared_form_data)
+
+    validation_signature = request_helper.create_hmac_hash(validation_token)
+    verification_signature = request_helper.create_hmac_hash(
+        validation_signature + form_signature
+    )
+
+    requests_mock.post(
+        "https://host.local/api/v1/verification/verify",
+        json={
+            "valid": True,
+            "verificationSignature": verification_signature,
+            "verifiedFields": {"name": VerificationResult.FIELD_VALID},
+            "issues": [],
+        },
+        status_code=200,
+    )
+
+    mf = MosparoField()
+    mf.verify_data(form)
+
+
 def test_mosparo_field_verify_data_with_ignored_callback(requests_mock):
     # Prepare the form
     class DummyForm(Form):

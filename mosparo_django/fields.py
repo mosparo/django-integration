@@ -171,6 +171,9 @@ class MosparoField(forms.BooleanField):
             ):
                 continue
 
+            if 'class' in field.widget.attrs and 'mosparo__ignored-field' in field.widget.attrs['class']:
+                continue
+
             name = key
 
             if field.required:

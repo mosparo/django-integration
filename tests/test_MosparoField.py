@@ -111,7 +111,11 @@ def test_mosparo_field_verify_data_with_ignored_field(requests_mock):
     # Prepare the form
     class DummyForm(Form):
         name = CharField(label="Name", max_length=255)
-        email = CharField(label="Email", max_length=255, widget=TextInput(attrs={"class": "mosparo__ignored-field"}))
+        email = CharField(
+            label="Email",
+            max_length=255,
+            widget=TextInput(attrs={"class": "mosparo__ignored-field"}),
+        )
         password = CharField(label="Password", max_length=255, widget=PasswordInput)
 
     data = QueryDict(

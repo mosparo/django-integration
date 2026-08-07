@@ -8,7 +8,7 @@ from .fields import MosparoField
 class MosparoForm(forms.Form):
     def clean(self):
         mosparo_field = None
-        for key, field in self.fields.items():
+        for field in self.fields.values():
             if isinstance(field, MosparoField):
                 mosparo_field = field
                 break

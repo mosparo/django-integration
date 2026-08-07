@@ -21,9 +21,9 @@ required_settings = [
 
 for setting, type in settings_types.items():
     if not hasattr(settings, setting) and setting in required_settings:
-        raise ImproperlyConfigured('Setting "%s" is not defined.' % setting)
+        raise ImproperlyConfigured('Setting "{}" is not defined.'.format(setting))
 
     if hasattr(settings, setting) and not isinstance(getattr(settings, setting), type):
         raise ImproperlyConfigured(
-            'Type of Setting "%s" is not correct. Should be "%s".' % (setting, type)
+            'Type of Setting "{}" is not correct. Should be "{}".'.format(setting, type)
         )

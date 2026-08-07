@@ -43,3 +43,6 @@ dependencies = [
 optional-dependencies.dev = [ "pytest-django", "pytest-runner", "requests-mock" ]
 urls.GitHub = "https://github.com/mosparo/django-integration"
 urls.Website = "https://mosparo.io"
+
+[tool.ruff.lint]
+ignore = ["RUF012"]

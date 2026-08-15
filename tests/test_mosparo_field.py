@@ -1,8 +1,7 @@
-from django.forms import Form, Widget, CharField, URLField, PasswordInput, TextInput
-from django.core.exceptions import ImproperlyConfigured, ValidationError
 import pytest
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.forms import CharField, Form, PasswordInput, TextInput, URLField, Widget
 from django.http import QueryDict
-
 from mosparo_api_client import RequestHelper, VerificationResult
 
 from mosparo_django.fields import MosparoField

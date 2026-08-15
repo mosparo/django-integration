@@ -2,8 +2,8 @@ from django import forms
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.translation import gettext_lazy as _
-
 from mosparo_api_client import Client
+
 from mosparo_django.config import FrontendConfig
 from mosparo_django.widgets import MosparoWidget
 

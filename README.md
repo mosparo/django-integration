@@ -56,24 +56,25 @@ pip install dist/mosparo_django-1.0.2-py3-none-any.whl
 ```python
 INSTALLED_APPS = [
     # ...
-    'mosparo_django',
+    "mosparo_django",
 ]
 ```
 3. Specify the configuration for mosparo:
 ```python
-MOSPARO_HOST = 'https://...'
-MOSPARO_UUID = '...'
-MOSPARO_PUBLIC_KEY = '...'
-MOSPARO_PRIVATE_KEY = '...'
+MOSPARO_HOST = "https://..."
+MOSPARO_UUID = "..."
+MOSPARO_PUBLIC_KEY = "..."
+MOSPARO_PRIVATE_KEY = "..."
 MOSPARO_VERIFY_SSL = True
 ```
 4. Add the mosparo field to your form:
 ```python
 from mosparo_django.fields import MosparoField
 
+
 class Form(forms.Form):
     # Your other fields...
-    mosparo = MosparoField(label='Spam protection')
+    mosparo = MosparoField(label="Spam protection")
 ```
 5. Add the verification (see [Verification](#verification))
 6. Test your form and verify that everything works correctly and you see the submission in mosparo.
@@ -90,9 +91,10 @@ Use the mosparo Form class to create your form instead of the `django.forms.Form
 from mosparo_django.forms import MosparoForm
 from mosparo_django.fields import MosparoField
 
+
 class Form(MosparoForm):
     # Your other fields...
-    mosparo = MosparoField(label='Spam protection')
+    mosparo = MosparoField(label="Spam protection")
 ```
 
 #### Override the `clean` method
@@ -102,12 +104,13 @@ The other option is to override the method `clean` of the Form class:
 ```python
 from mosparo_django.fields import MosparoField
 
+
 class Form(forms.Form):
     # Your other fields...
-    mosparo = MosparoField(label='Spam protection')
+    mosparo = MosparoField(label="Spam protection")
 
     def clean(self):
-        self.fields['mosparo'].verify_data(self)
+        self.fields["mosparo"].verify_data(self)
 
         return super().clean()
 ```
@@ -122,9 +125,15 @@ You can also specify the connection details on the field. For that, please add t
 from mosparo_django.forms import MosparoForm
 from mosparo_django.fields import MosparoField
 
+
 class Form(MosparoForm):
     # Your other fields...
-    mosparo = MosparoField(label='Spam protection', mosparo_uuid='123', mosparo_public_key='test_key', mosparo_private_key = 'private_key')
+    mosparo = MosparoField(
+        label="Spam protection",
+        mosparo_uuid="123",
+        mosparo_public_key="test_key",
+        mosparo_private_key="private_key",
+    )
 ```
 
 ### Filter the field types and form data
@@ -135,9 +144,14 @@ The MosparoField offers some callback methods to adjust the behavior of the fiel
 from mosparo_django.forms import MosparoForm
 from mosparo_django.fields import MosparoField
 
+
 class Form(MosparoForm):
     # Your other fields...
-    mosparo = MosparoField(callback_ignored_field_types=None, callback_verifiable_field_types=None, callback_after_prepare_form_data=None)
+    mosparo = MosparoField(
+        callback_ignored_field_types=None,
+        callback_verifiable_field_types=None,
+        callback_after_prepare_form_data=None,
+    )
 ```
 
 | Argument name                      | Description                                                                                                                                          |

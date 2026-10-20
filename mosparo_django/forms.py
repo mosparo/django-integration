@@ -6,16 +6,10 @@ from .fields import MosparoField
 
 
 class MosparoForm(forms.Form):
+    # MosparoField verifies the submission itself, a plain forms.Form works
+    # just as well. This class only ensures that the field isn't forgotten.
     def clean(self):
-        mosparo_field = None
-        for field in self.fields.values():
-            if isinstance(field, MosparoField):
-                mosparo_field = field
-                break
-
-        if mosparo_field is None:
+        if not any(isinstance(f, MosparoField) for f in self.fields.values()):
             raise ValidationError(_("No mosparo field found in form."))
-
-        mosparo_field.verify_data(self)
 
         return super().clean()

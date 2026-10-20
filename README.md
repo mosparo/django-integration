@@ -124,9 +124,11 @@ class Form(forms.Form):
 
 | Argument name                      | Description                                                                                                                                          |
 |------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `callback_ignored_field_types`     | Gets and returns a list of class names of field types, which should be ignored (Example: `PasswordInput`)                                            |
-| `callback_verifiable_field_types`  | Gets and returns a list of class names of field types, which are verifiable (Example: `TextInput`)                                                   |
+| `callback_ignored_field_types`     | Gets and returns a list of field or widget classes which should be ignored, including their subclasses (Example: `forms.PasswordInput`)             |
+| `callback_verifiable_field_types`  | Gets and returns a list of field or widget classes which are verifiable, including their subclasses (Example: `forms.TextInput`)                    |
 | `callback_after_prepare_form_data` | Gets the dict with all prepared form data, the required field names, and the verifiable field names as argument and expects the same to be returned. |
+
+Class names (e.g. `"PasswordInput"`) are still accepted in the field type lists, but they are deprecated and only match the exact class, not subclasses.
 
 ## License
 

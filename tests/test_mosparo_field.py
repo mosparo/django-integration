@@ -1,6 +1,14 @@
 import pytest
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.forms import CharField, Form, PasswordInput, TextInput, URLField, Widget
+from django.forms import (
+    CharField,
+    Form,
+    PasswordInput,
+    TextInput,
+    URLField,
+    Widget,
+)
+from django.forms.widgets import Input
 from django.http import QueryDict
 from mosparo_api_client import RequestHelper, VerificationResult
 
@@ -211,8 +219,8 @@ def test_mosparo_field_verify_data_with_ignored_callback(requests_mock):
 
 
 def test_mosparo_field_verify_data_with_verifiable_callback(requests_mock):
-    class TestInput(TextInput):
-        pass
+    class TestInput(Input):
+        input_type = "text"
 
     # Prepare the form
     class DummyForm(Form):
@@ -261,7 +269,7 @@ def test_mosparo_field_verify_data_with_verifiable_callback(requests_mock):
 
     def test_callback(types):
         # Add TestInput to the list of verifiable fields
-        return types + ["TestInput"]
+        return types + [TestInput]
 
     mf = MosparoField(callback_verifiable_field_types=test_callback)
 
@@ -273,6 +281,49 @@ def test_mosparo_field_verify_data_with_verifiable_callback(requests_mock):
         "mosparo could not verify the data. Please check the submission in mosparo."
         in str(exc.value)
     )
+
+
+def test_mosparo_field_ignores_subclasses_of_ignored_types():
+    class CustomPasswordInput(PasswordInput):
+        pass
+
+    class DummyForm(Form):
+        name = CharField(label="Name", max_length=255)
+        password = CharField(
+            label="Password", max_length=255, widget=CustomPasswordInput
+        )
+        mosparo = MosparoField()
+
+    form = DummyForm(data=QueryDict("name=Test&password=secret"))
+
+    assert form.fields["mosparo"].prepare_form_data(form) == {
+        "form_data": {"name": "Test"},
+        "required_fields": ["name"],
+        "verifiable_fields": ["name"],
+    }
+
+
+def test_mosparo_field_deprecated_field_type_names():
+    class TestInput(Input):
+        input_type = "text"
+
+    class DummyForm(Form):
+        name = CharField(label="Name", max_length=255)
+        test_field = CharField(label="Test", max_length=255, widget=TestInput)
+
+    form = DummyForm(data=QueryDict("name=Test&test_field=Test"))
+    mf = MosparoField(
+        callback_ignored_field_types=lambda types: types + ["NonexistentInput"],
+        callback_verifiable_field_types=lambda types: types + ["TestInput"],
+    )
+
+    with pytest.warns(DeprecationWarning) as record:
+        data = mf.prepare_form_data(form)
+
+    messages = {str(w.message) for w in record}
+    assert any("'NonexistentInput'" in m for m in messages)
+    assert any("'TestInput'" in m for m in messages)
+    assert data["verifiable_fields"] == ["name", "test_field"]
 
 
 def test_mosparo_field_verify_data_with_after_data_callback(requests_mock):

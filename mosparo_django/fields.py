@@ -1,3 +1,4 @@
+import warnings
 import weakref
 
 from django import forms
@@ -165,26 +166,26 @@ class MosparoField(forms.BooleanField):
     def prepare_form_data(self, form: forms.Form):
         data = {"form_data": {}, "required_fields": [], "verifiable_fields": []}
         ignored_field_types = [
-            "BooleanField",
-            "NullBooleanSelect",
-            "CheckboxInput",
-            "RadioSelect",
-            "CheckboxSelectMultiple",
-            "PasswordInput",
-            "HiddenInput",
-            "MultipleHiddenInput",
-            "FileInput",
-            "ClearableFileInput",
-            "MosparoField",
+            forms.BooleanField,
+            forms.NullBooleanSelect,
+            forms.CheckboxInput,
+            forms.RadioSelect,
+            forms.CheckboxSelectMultiple,
+            forms.PasswordInput,
+            forms.HiddenInput,
+            forms.MultipleHiddenInput,
+            forms.FileInput,
+            forms.ClearableFileInput,
+            MosparoField,
         ]
         if self.callback_ignored_field_types is not None:
             ignored_field_types = self.callback_ignored_field_types(ignored_field_types)
 
         verifiable_field_types = [
-            "TextInput",
-            "Textarea",
-            "EmailInput",
-            "URLInput",
+            forms.TextInput,
+            forms.Textarea,
+            forms.EmailInput,
+            forms.URLInput,
         ]
         if self.callback_verifiable_field_types is not None:
             verifiable_field_types = self.callback_verifiable_field_types(
@@ -192,10 +193,7 @@ class MosparoField(forms.BooleanField):
             )
 
         for key, field in form.fields.items():
-            if (
-                type(field).__name__ in ignored_field_types
-                or type(field.widget).__name__ in ignored_field_types
-            ):
+            if _matches_field_types(field, ignored_field_types):
                 continue
 
             if (
@@ -209,10 +207,7 @@ class MosparoField(forms.BooleanField):
             if field.required:
                 data["required_fields"].append(name)
 
-            if (
-                type(field).__name__ in verifiable_field_types
-                or type(field.widget).__name__ in verifiable_field_types
-            ):
+            if _matches_field_types(field, verifiable_field_types):
                 data["verifiable_fields"].append(name)
 
             if key in form.data:
@@ -222,3 +217,19 @@ class MosparoField(forms.BooleanField):
             data = self.callback_after_prepare_form_data(data)
 
         return data
+
+
+def _matches_field_types(field, field_types):
+    for field_type in field_types:
+        if isinstance(field_type, str):
+            warnings.warn(
+                f"Field types should be classes, not names. Replace {field_type!r}"
+                " with the field or widget class.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+            if field_type in (type(field).__name__, type(field.widget).__name__):
+                return True
+        elif isinstance(field, field_type) or isinstance(field.widget, field_type):
+            return True
+    return False

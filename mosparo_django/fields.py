@@ -204,7 +204,7 @@ class MosparoField(forms.BooleanField):
             ):
                 continue
 
-            name = key
+            name = form.add_prefix(key)
 
             if field.required:
                 data["required_fields"].append(name)
@@ -215,8 +215,8 @@ class MosparoField(forms.BooleanField):
             ):
                 data["verifiable_fields"].append(name)
 
-            if key in form.data:
-                data["form_data"][key] = form.data[key]
+            if name in form.data:
+                data["form_data"][name] = form.data[name]
 
         if self.callback_after_prepare_form_data is not None:
             data = self.callback_after_prepare_form_data(data)

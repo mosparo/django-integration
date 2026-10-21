@@ -28,3 +28,7 @@ msgstr ""
 #: forms.py:16
 msgid "No mosparo field found in form."
 msgstr ""
+
+#: templates/mosparo/box.html:1
+msgid "The spam protection could not be loaded. The form cannot be submitted. Please reload the page or try again later."
+msgstr ""

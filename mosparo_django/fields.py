@@ -1,3 +1,6 @@
+import warnings
+import weakref
+
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -74,10 +77,35 @@ class MosparoField(forms.BooleanField):
         # Hide the label for the field, important for the invisible mode.
         self.label = ""
 
+    def get_bound_field(self, form, field_name):
+        # Remember the form so that clean() can verify the whole submission.
+        # Each form instance works on its own deep copy of the fields.
+        self._form = weakref.ref(form)
+        return super().get_bound_field(form, field_name)
+
     def validate(self, value):
         return True
 
+    def clean(self, value):
+        value = super().clean(value)
+
+        form = self._form() if getattr(self, "_form", None) else None
+        if form is None:
+            raise ImproperlyConfigured(
+                "MosparoField can only be cleaned as part of a form."
+            )
+
+        self.verify_data(form)
+        return value
+
     def verify_data(self, form: forms.Form):
+        # The submission can only be verified once, clean() and the legacy
+        # verification in Form.clean() would otherwise both hit the API.
+        verified_form = getattr(self, "_verified_form", None)
+        if verified_form is not None and verified_form() is form:
+            return
+        self._verified_form = weakref.ref(form)
+
         api_client = Client(
             self.mosparo_host,
             self.mosparo_public_key,
@@ -138,26 +166,26 @@ class MosparoField(forms.BooleanField):
     def prepare_form_data(self, form: forms.Form):
         data = {"form_data": {}, "required_fields": [], "verifiable_fields": []}
         ignored_field_types = [
-            "BooleanField",
-            "NullBooleanSelect",
-            "CheckboxInput",
-            "RadioSelect",
-            "CheckboxSelectMultiple",
-            "PasswordInput",
-            "HiddenInput",
-            "MultipleHiddenInput",
-            "FileInput",
-            "ClearableFileInput",
-            "MosparoField",
+            forms.BooleanField,
+            forms.NullBooleanSelect,
+            forms.CheckboxInput,
+            forms.RadioSelect,
+            forms.CheckboxSelectMultiple,
+            forms.PasswordInput,
+            forms.HiddenInput,
+            forms.MultipleHiddenInput,
+            forms.FileInput,
+            forms.ClearableFileInput,
+            MosparoField,
         ]
         if self.callback_ignored_field_types is not None:
             ignored_field_types = self.callback_ignored_field_types(ignored_field_types)
 
         verifiable_field_types = [
-            "TextInput",
-            "Textarea",
-            "EmailInput",
-            "URLInput",
+            forms.TextInput,
+            forms.Textarea,
+            forms.EmailInput,
+            forms.URLInput,
         ]
         if self.callback_verifiable_field_types is not None:
             verifiable_field_types = self.callback_verifiable_field_types(
@@ -165,10 +193,7 @@ class MosparoField(forms.BooleanField):
             )
 
         for key, field in form.fields.items():
-            if (
-                type(field).__name__ in ignored_field_types
-                or type(field.widget).__name__ in ignored_field_types
-            ):
+            if _matches_field_types(field, ignored_field_types):
                 continue
 
             if (
@@ -182,10 +207,7 @@ class MosparoField(forms.BooleanField):
             if field.required:
                 data["required_fields"].append(name)
 
-            if (
-                type(field).__name__ in verifiable_field_types
-                or type(field.widget).__name__ in verifiable_field_types
-            ):
+            if _matches_field_types(field, verifiable_field_types):
                 data["verifiable_fields"].append(name)
 
             if key in form.data:
@@ -195,3 +217,19 @@ class MosparoField(forms.BooleanField):
             data = self.callback_after_prepare_form_data(data)
 
         return data
+
+
+def _matches_field_types(field, field_types):
+    for field_type in field_types:
+        if isinstance(field_type, str):
+            warnings.warn(
+                f"Field types should be classes, not names. Replace {field_type!r}"
+                " with the field or widget class.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
+            if field_type in (type(field).__name__, type(field.widget).__name__):
+                return True
+        elif isinstance(field, field_type) or isinstance(field.widget, field_type):
+            return True
+    return False

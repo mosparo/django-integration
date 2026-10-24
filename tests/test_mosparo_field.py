@@ -388,3 +388,48 @@ def test_mosparo_field_verify_data_validation_error(requests_mock):
         "mosparo could not verify the data. Please check the submission in mosparo."
         in str(exc.value)
     )
+
+
+def test_mosparo_field_clean_outside_of_form():
+    mf = MosparoField()
+
+    with pytest.raises(ImproperlyConfigured):
+        mf.clean(None)
+
+
+def test_mosparo_field_in_plain_form(requests_mock):
+    class DummyForm(Form):
+        name = CharField(label="Name", max_length=255)
+        mosparo = MosparoField()
+
+    request_helper = RequestHelper("public_key", "private_key")
+    prepared_form_data = request_helper.prepare_form_data({"name": "Test"})
+    form_signature = request_helper.create_form_data_hmac_hash(prepared_form_data)
+    validation_signature = request_helper.create_hmac_hash("validationToken")
+    verification_signature = request_helper.create_hmac_hash(
+        validation_signature + form_signature
+    )
+
+    requests_mock.post(
+        "https://host.local/api/v1/verification/verify",
+        json={
+            "valid": True,
+            "verificationSignature": verification_signature,
+            "verifiedFields": {"name": VerificationResult.FIELD_VALID},
+            "issues": [],
+        },
+        status_code=200,
+    )
+
+    form = DummyForm(
+        data=QueryDict(
+            "name=Test&_mosparo_submitToken=submitToken&_mosparo_validationToken=validationToken"
+        )
+    )
+
+    assert form.is_valid() is True
+    assert requests_mock.call_count == 1
+
+    # Verifying again, e.g. from a legacy Form.clean(), doesn't hit the API
+    form.fields["mosparo"].verify_data(form)
+    assert requests_mock.call_count == 1

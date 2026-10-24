@@ -32,3 +32,29 @@ def test_mosparo_form_without_field():
 
     # Form should be invalid since no mosparo field was added to the form
     assert res is False
+
+
+def test_plain_form_verifies_once():
+    calls = []
+
+    class DummyMosparoField(MosparoField):
+        def verify_data(self, form: Form):
+            calls.append(form)
+            super().verify_data(form)
+
+    class CustomForm(Form):
+        name = CharField(label="Name", max_length=255)
+        mosparo = DummyMosparoField()
+
+        def clean(self):
+            # The legacy manual verification must not hit the API again
+            self.fields["mosparo"].verify_data(self)
+            return super().clean()
+
+    form = CustomForm({"name": "Test"})
+
+    assert form.is_valid() is False
+    assert calls == [form, form]
+    assert form.errors == {
+        "mosparo": ["mosparo specific fields were not found in the submitted data."]
+    }

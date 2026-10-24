@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mosparo_django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 18:09+0200\n"
+"POT-Creation-Date: 2026-10-24 19:52+0200\n"
 "PO-Revision-Date: 2025-12-08 13:00+0000\n"
 "Last-Translator: 이정희 <daemul72@gmail.com>\n"
 "Language-Team: Korean <https://hosted.weblate.org/projects/mosparo/"
@@ -18,11 +18,15 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Weblate 5.15-dev\n"
 
-#: fields.py:136
+#: fields.py:128
+msgid "The spam protection is currently unavailable. Please try again later."
+msgstr ""
+
+#: fields.py:153
 msgid "mosparo specific fields were not found in the submitted data."
 msgstr "제출된 데이터에서 mosparo 특정 필드를 찾을 수 없습니다."
 
-#: fields.py:166
+#: fields.py:183
 msgid "The spam protection could not verify the data."
 msgstr ""
 

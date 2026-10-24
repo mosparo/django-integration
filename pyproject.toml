@@ -38,6 +38,7 @@ classifiers = [
 dependencies = [
   "django>=4.2",
   "mosparo-api-client>=1.1",
+  "requests>=2.32",
 ]
 optional-dependencies.dev = [ "pytest-django", "pytest-runner", "requests-mock" ]
 urls.GitHub = "https://github.com/mosparo/django-integration"

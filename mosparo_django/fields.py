@@ -1,14 +1,18 @@
+import logging
 import warnings
 import weakref
 
+import requests
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.utils.translation import gettext_lazy as _
-from mosparo_api_client import Client
+from mosparo_api_client import Client, MosparoException
 
 from mosparo_django.config import FrontendConfig
 from mosparo_django.widgets import MosparoWidget
+
+logger = logging.getLogger(__name__)
 
 
 class MosparoField(forms.BooleanField):
@@ -112,6 +116,19 @@ class MosparoField(forms.BooleanField):
 
         try:
             self._verify_submission(form)
+        except (MosparoException, requests.exceptions.RequestException):
+            # mosparo couldn't be reached or returned an invalid response. This
+            # isn't a verification result, so it isn't remembered and a later
+            # validation of the form asks mosparo again.
+            logger.exception("The submission could not be verified with mosparo.")
+            form.valid = False
+
+            raise ValidationError(
+                _(
+                    "The spam protection is currently unavailable. Please try again later."
+                ),
+                code="mosparo_unavailable",
+            )
         except ValidationError as e:
             self._verification_error = e
             self._verified_form = weakref.ref(form)

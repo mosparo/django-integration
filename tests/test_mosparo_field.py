@@ -11,7 +11,7 @@ from django.forms import (
 )
 from django.forms.widgets import Input
 from django.http import QueryDict
-from mosparo_api_client import MosparoException, RequestHelper, VerificationResult
+from mosparo_api_client import RequestHelper, VerificationResult
 
 from mosparo_django.fields import MosparoField
 
@@ -527,7 +527,7 @@ def test_mosparo_field_repeated_full_clean_keeps_error():
     assert "mosparo" in form.errors
 
 
-def test_mosparo_field_retries_after_connection_error(requests_mock):
+def test_mosparo_field_retries_after_connection_error(requests_mock, caplog):
     class DummyForm(Form):
         name = CharField(label="Name", max_length=255)
         mosparo = MosparoField()
@@ -551,8 +551,15 @@ def test_mosparo_field_retries_after_connection_error(requests_mock):
         "https://host.local/api/v1/verification/verify",
         exc=requests.exceptions.ConnectTimeout,
     )
-    with pytest.raises(MosparoException):
-        form.full_clean()
+    form.full_clean()
+
+    assert form.is_valid() is False
+    assert form.errors == {
+        "mosparo": [
+            "The spam protection is currently unavailable. Please try again later."
+        ]
+    }
+    assert "The submission could not be verified with mosparo." in caplog.text
 
     # mosparo is reachable again, the submission gets verified
     requests_mock.post(
@@ -569,3 +576,29 @@ def test_mosparo_field_retries_after_connection_error(requests_mock):
 
     assert form.is_valid() is True
     assert requests_mock.call_count == 2
+
+
+def test_mosparo_field_invalid_response(requests_mock):
+    class DummyForm(Form):
+        name = CharField(label="Name", max_length=255)
+        mosparo = MosparoField()
+
+    # For example, a proxy in front of mosparo returns an HTML error page
+    requests_mock.post(
+        "https://host.local/api/v1/verification/verify",
+        text="<html>502 Bad Gateway</html>",
+        status_code=502,
+    )
+
+    form = DummyForm(
+        data=QueryDict(
+            "name=Test&_mosparo_submitToken=submitToken&_mosparo_validationToken=validationToken"
+        )
+    )
+
+    assert form.is_valid() is False
+    assert form.errors == {
+        "mosparo": [
+            "The spam protection is currently unavailable. Please try again later."
+        ]
+    }

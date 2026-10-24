@@ -69,6 +69,7 @@ MOSPARO_VERIFY_SSL = True
 ```
 4. Add the mosparo field to your form:
 ```python
+from django import forms
 from mosparo_django.fields import MosparoField
 
 
@@ -76,57 +77,24 @@ class Form(forms.Form):
     # Your other fields...
     mosparo = MosparoField(label="Spam protection")
 ```
-5. Add the verification (see [Verification](#verification))
-6. Test your form and verify that everything works correctly and you see the submission in mosparo.
+5. Test your form and verify that everything works correctly and you see the submission in mosparo.
 
 ### Verification
 
-After the user submits the form, the backend has to verify the form data before you can process them. Since we didn't find a good way to do this automatically, you have to implement one of the following options:
+The field verifies the submitted data with mosparo when the form is validated (for example, when calling `form.is_valid()`). If the verification fails, the error is attached to the mosparo field. No changes to the form class are needed, any `django.forms.Form` works.
 
-#### Use the mosparo Form class
-
-Use the mosparo Form class to create your form instead of the `django.forms.Form` class:
-
-```python
-from mosparo_django.forms import MosparoForm
-from mosparo_django.fields import MosparoField
-
-
-class Form(MosparoForm):
-    # Your other fields...
-    mosparo = MosparoField(label="Spam protection")
-```
-
-#### Override the `clean` method
-
-The other option is to override the method `clean` of the Form class:
-
-```python
-from mosparo_django.fields import MosparoField
-
-
-class Form(forms.Form):
-    # Your other fields...
-    mosparo = MosparoField(label="Spam protection")
-
-    def clean(self):
-        self.fields["mosparo"].verify_data(self)
-
-        return super().clean()
-```
-
-**Important: No spam protection will happen if you do not use one of these two things.**
+Earlier versions required using `mosparo_django.forms.MosparoForm` or calling `self.fields["mosparo"].verify_data(self)` in `Form.clean()`. Both still work, the submission is only verified once. `MosparoForm` additionally rejects forms which don't contain a `MosparoField`.
 
 ### Specify the connection details on the field
 
 You can also specify the connection details on the field. For that, please add the field to your form and specify the connection settings by setting the parameters `mosparo_host`, `mosparo_uuid`, `mosparo_public_key`, `mosparo_private_key`, and `mosparo_verify_ssl`. If you want to change the UUID, public or private key, you have to specify all these three values because these depend on the project and if you want to connect the field to a different project, all three values will be different.
 
 ```python
-from mosparo_django.forms import MosparoForm
+from django import forms
 from mosparo_django.fields import MosparoField
 
 
-class Form(MosparoForm):
+class Form(forms.Form):
     # Your other fields...
     mosparo = MosparoField(
         label="Spam protection",
@@ -141,11 +109,11 @@ class Form(MosparoForm):
 The MosparoField offers some callback methods to adjust the behavior of the field.
 
 ```python
-from mosparo_django.forms import MosparoForm
+from django import forms
 from mosparo_django.fields import MosparoField
 
 
-class Form(MosparoForm):
+class Form(forms.Form):
     # Your other fields...
     mosparo = MosparoField(
         callback_ignored_field_types=None,

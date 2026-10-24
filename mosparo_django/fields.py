@@ -1,3 +1,5 @@
+import weakref
+
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, ValidationError
@@ -74,10 +76,35 @@ class MosparoField(forms.BooleanField):
         # Hide the label for the field, important for the invisible mode.
         self.label = ""
 
+    def get_bound_field(self, form, field_name):
+        # Remember the form so that clean() can verify the whole submission.
+        # Each form instance works on its own deep copy of the fields.
+        self._form = weakref.ref(form)
+        return super().get_bound_field(form, field_name)
+
     def validate(self, value):
         return True
 
+    def clean(self, value):
+        value = super().clean(value)
+
+        form = self._form() if getattr(self, "_form", None) else None
+        if form is None:
+            raise ImproperlyConfigured(
+                "MosparoField can only be cleaned as part of a form."
+            )
+
+        self.verify_data(form)
+        return value
+
     def verify_data(self, form: forms.Form):
+        # The submission can only be verified once, clean() and the legacy
+        # verification in Form.clean() would otherwise both hit the API.
+        verified_form = getattr(self, "_verified_form", None)
+        if verified_form is not None and verified_form() is form:
+            return
+        self._verified_form = weakref.ref(form)
+
         api_client = Client(
             self.mosparo_host,
             self.mosparo_public_key,

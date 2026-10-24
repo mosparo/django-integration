@@ -162,11 +162,7 @@ class MosparoField(forms.BooleanField):
                 return
 
         form.valid = False
-        raise ValidationError(
-            _(
-                "The spam protection could not verify the data."
-            )
-        )
+        raise ValidationError(_("The spam protection could not verify the data."))
 
     def get_mosparo_host(self):
         return self.mosparo_host
@@ -219,7 +215,7 @@ class MosparoField(forms.BooleanField):
             ):
                 continue
 
-            name = key
+            name = form.add_prefix(key)
 
             if field.required:
                 data["required_fields"].append(name)
@@ -230,8 +226,8 @@ class MosparoField(forms.BooleanField):
             ):
                 data["verifiable_fields"].append(name)
 
-            if key in form.data:
-                data["form_data"][key] = form.data[key]
+            if name in form.data:
+                data["form_data"][name] = form.data[name]
 
         if self.callback_after_prepare_form_data is not None:
             data = self.callback_after_prepare_form_data(data)

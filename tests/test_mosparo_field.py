@@ -1,8 +1,7 @@
-from django.forms import Form, Widget, CharField, URLField, PasswordInput, TextInput
-from django.core.exceptions import ImproperlyConfigured, ValidationError
 import pytest
+from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.forms import CharField, Form, PasswordInput, TextInput, URLField, Widget
 from django.http import QueryDict
-
 from mosparo_api_client import RequestHelper, VerificationResult
 
 from mosparo_django.fields import MosparoField
@@ -111,7 +110,11 @@ def test_mosparo_field_verify_data_with_ignored_field(requests_mock):
     # Prepare the form
     class DummyForm(Form):
         name = CharField(label="Name", max_length=255)
-        email = CharField(label="Email", max_length=255, widget=TextInput(attrs={"class": "mosparo__ignored-field"}))
+        email = CharField(
+            label="Email",
+            max_length=255,
+            widget=TextInput(attrs={"class": "mosparo__ignored-field"}),
+        )
         password = CharField(label="Password", max_length=255, widget=PasswordInput)
 
     data = QueryDict(
@@ -202,7 +205,7 @@ def test_mosparo_field_verify_data_with_ignored_callback(requests_mock):
         mf.verify_data(form)
 
     assert (
-        "mosparo could not verify the data. Please check the submission in mosparo."
+        "The spam protection could not verify the data."
         in str(exc.value)
     )
 
@@ -267,7 +270,7 @@ def test_mosparo_field_verify_data_with_verifiable_callback(requests_mock):
 
     # Fails, because not all verifiable fields got verified (the TestInput field type was missing)
     assert (
-        "mosparo could not verify the data. Please check the submission in mosparo."
+        "The spam protection could not verify the data."
         in str(exc.value)
     )
 
@@ -332,7 +335,7 @@ def test_mosparo_field_verify_data_with_after_data_callback(requests_mock):
 
     # Fails, because
     assert (
-        "mosparo could not verify the data. Please check the submission in mosparo."
+        "The spam protection could not verify the data."
         in str(exc.value)
     )
 
@@ -382,6 +385,6 @@ def test_mosparo_field_verify_data_validation_error(requests_mock):
         mf.verify_data(form)
 
     assert (
-        "mosparo could not verify the data. Please check the submission in mosparo."
+        "The spam protection could not verify the data."
         in str(exc.value)
     )

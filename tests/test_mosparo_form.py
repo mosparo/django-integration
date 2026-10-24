@@ -1,7 +1,7 @@
-from django.forms import Form, CharField
+from django.forms import CharField, Form
 
-from mosparo_django.forms import MosparoForm
 from mosparo_django.fields import MosparoField
+from mosparo_django.forms import MosparoForm
 
 
 def test_mosparo_form():

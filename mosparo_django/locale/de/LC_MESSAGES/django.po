@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: mosparo_django 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-11 19:23+0200\n"
+"POT-Creation-Date: 2026-10-24 18:09+0200\n"
 "PO-Revision-Date: 2025-06-11 19:26+0200\n"
 "Last-Translator: Matthias Zobrist <info@mosparo.io>\n"
 "Language-Team: \n"
@@ -17,14 +17,27 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-#: fields.py:73
+
+#: fields.py:136
 msgid "mosparo specific fields were not found in the submitted data."
 msgstr "Die mosparo Felder wurden in den übermittelten Daten nicht gefunden."
 
-#: fields.py:92
-msgid "mosparo could not verify the data. Please check the submission in mosparo."
-msgstr "mosparo konnte die Daten nicht verifizieren. Bitte überprüfen Sie die Eingabe in mosparo."
+#: fields.py:166
+msgid "The spam protection could not verify the data."
+msgstr ""
 
-#: forms.py:16
+#: forms.py:13
 msgid "No mosparo field found in form."
 msgstr "Im Formular wurde kein mosparo-Feld gefunden."
+
+#: templates/mosparo/box.html:1
+msgid ""
+"The spam protection could not be loaded. The form cannot be submitted. "
+"Please reload the page or try again later."
+msgstr ""
+
+#~ msgid ""
+#~ "mosparo could not verify the data. Please check the submission in mosparo."
+#~ msgstr ""
+#~ "mosparo konnte die Daten nicht verifizieren. Bitte überprüfen Sie die "
+#~ "Eingabe in mosparo."

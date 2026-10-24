@@ -122,7 +122,7 @@ class MosparoField(forms.BooleanField):
         form.valid = False
         raise ValidationError(
             _(
-                "mosparo could not verify the data. Please check the submission in mosparo."
+                "The spam protection could not verify the data."
             )
         )
 

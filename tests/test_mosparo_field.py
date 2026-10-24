@@ -1,8 +1,9 @@
 import pytest
+import requests
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.forms import CharField, Form, PasswordInput, TextInput, URLField, Widget
 from django.http import QueryDict
-from mosparo_api_client import RequestHelper, VerificationResult
+from mosparo_api_client import MosparoException, RequestHelper, VerificationResult
 
 from mosparo_django.fields import MosparoField
 
@@ -433,3 +434,60 @@ def test_mosparo_field_in_plain_form(requests_mock):
     # Verifying again, e.g. from a legacy Form.clean(), doesn't hit the API
     form.fields["mosparo"].verify_data(form)
     assert requests_mock.call_count == 1
+
+
+def test_mosparo_field_repeated_full_clean_keeps_error():
+    class DummyForm(Form):
+        name = CharField(label="Name", max_length=255)
+        mosparo = MosparoField()
+
+    form = DummyForm({"name": "Test"})
+
+    assert form.is_valid() is False
+    form.full_clean()
+    assert form.is_valid() is False
+    assert "mosparo" in form.errors
+
+
+def test_mosparo_field_retries_after_connection_error(requests_mock):
+    class DummyForm(Form):
+        name = CharField(label="Name", max_length=255)
+        mosparo = MosparoField()
+
+    request_helper = RequestHelper("public_key", "private_key")
+    prepared_form_data = request_helper.prepare_form_data({"name": "Test"})
+    form_signature = request_helper.create_form_data_hmac_hash(prepared_form_data)
+    validation_signature = request_helper.create_hmac_hash("validationToken")
+    verification_signature = request_helper.create_hmac_hash(
+        validation_signature + form_signature
+    )
+
+    form = DummyForm(
+        data=QueryDict(
+            "name=Test&_mosparo_submitToken=submitToken&_mosparo_validationToken=validationToken"
+        )
+    )
+
+    # mosparo is not reachable, the error must not be cached as a result
+    requests_mock.post(
+        "https://host.local/api/v1/verification/verify",
+        exc=requests.exceptions.ConnectTimeout,
+    )
+    with pytest.raises(MosparoException):
+        form.full_clean()
+
+    # mosparo is reachable again, the submission gets verified
+    requests_mock.post(
+        "https://host.local/api/v1/verification/verify",
+        json={
+            "valid": True,
+            "verificationSignature": verification_signature,
+            "verifiedFields": {"name": VerificationResult.FIELD_VALID},
+            "issues": [],
+        },
+        status_code=200,
+    )
+    form.full_clean()
+
+    assert form.is_valid() is True
+    assert requests_mock.call_count == 2

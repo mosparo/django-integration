@@ -56,5 +56,6 @@ def test_plain_form_verifies_once():
     assert form.is_valid() is False
     assert calls == [form, form]
     assert form.errors == {
-        "mosparo": ["mosparo specific fields were not found in the submitted data."]
+        "mosparo": ["mosparo specific fields were not found in the submitted data."],
+        "__all__": ["mosparo specific fields were not found in the submitted data."],
     }

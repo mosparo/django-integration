@@ -23,6 +23,10 @@ class MosparoField(forms.BooleanField):
     callback_verifiable_field_types = None
     callback_after_prepare_form_data = None
 
+    _form = None
+    _verified_form = None
+    _verification_error = None
+
     def __init__(
         self,
         mosparo_host=None,
@@ -88,7 +92,7 @@ class MosparoField(forms.BooleanField):
     def clean(self, value):
         value = super().clean(value)
 
-        form = self._form() if getattr(self, "_form", None) else None
+        form = self._form() if self._form is not None else None
         if form is None:
             raise ImproperlyConfigured(
                 "MosparoField can only be cleaned as part of a form."
@@ -100,11 +104,22 @@ class MosparoField(forms.BooleanField):
     def verify_data(self, form: forms.Form):
         # The submission can only be verified once, clean() and the legacy
         # verification in Form.clean() would otherwise both hit the API.
-        verified_form = getattr(self, "_verified_form", None)
-        if verified_form is not None and verified_form() is form:
+        if self._verified_form is not None and self._verified_form() is form:
+            if self._verification_error is not None:
+                raise self._verification_error
             return
+
+        try:
+            self._verify_submission(form)
+        except ValidationError as e:
+            self._verification_error = e
+            self._verified_form = weakref.ref(form)
+            raise
+
+        self._verification_error = None
         self._verified_form = weakref.ref(form)
 
+    def _verify_submission(self, form: forms.Form):
         api_client = Client(
             self.mosparo_host,
             self.mosparo_public_key,

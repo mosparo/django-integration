@@ -7,7 +7,7 @@
     Integration for Django
 </h1>
 <p align="center">
-    This Django app offers the needed form, field, and widget class to add mosparo to your Django form.
+    This Django app offers the needed field and widget class to add mosparo to your Django form.
 </p>
 
 -----
@@ -45,7 +45,7 @@ python -m build
 ```
 3. Install the package
 ```commandline
-pip install dist/mosparo_django-1.0.2-py3-none-any.whl
+pip install dist/mosparo_django-2.0.0-py3-none-any.whl
 ```
 
 ## Usage
@@ -66,6 +66,7 @@ MOSPARO_UUID = "..."
 MOSPARO_PUBLIC_KEY = "..."
 MOSPARO_PRIVATE_KEY = "..."
 MOSPARO_VERIFY_SSL = True
+MOSPARO_TIMEOUT = 10  # Optional, in seconds. None waits without a limit.
 ```
 4. Add the mosparo field to your form:
 ```python
@@ -83,11 +84,31 @@ class Form(forms.Form):
 
 The field verifies the submitted data with mosparo when the form is validated (for example, when calling `form.is_valid()`). If the verification fails, the error is attached to the mosparo field. No changes to the form class are needed, any `django.forms.Form` works.
 
-Earlier versions required using `mosparo_django.forms.MosparoForm` or calling `self.fields["mosparo"].verify_data(self)` in `Form.clean()`. Both still work, the submission is only verified once. `MosparoForm` additionally rejects forms which don't contain a `MosparoField`.
+### Fields sent to mosparo
+
+The mosparo frontend collects the fields of the rendered form, and mosparo only accepts the submission if the backend sends exactly the same fields. The field therefore decides by the rendered HTML input type of each widget which fields it sends to mosparo:
+
+- Inputs of the types `password`, `file`, `hidden`, `checkbox`, and `radio` are ignored, like in the frontend (e.g. `PasswordInput`, `FileInput`, `HiddenInput`, `CheckboxInput`, `RadioSelect`, `CheckboxSelectMultiple`).
+- Inputs of the types `submit`, `reset`, and `button` are ignored, because the frontend doesn't collect them.
+- All other fields are sent, including `<select>` and `<textarea>`. This also applies to a `NullBooleanField` or a `BooleanField` with a `Select` widget.
+- Widgets which render several inputs (e.g. `SplitDateTimeWidget` or `SelectDateWidget`) are handled input by input, using the rendered names like `appointment_0` and `appointment_1`.
+- The selected options of a `<select multiple>` (e.g. `MultipleChoiceField`) are sent as a list, like the frontend collects them.
+
+To ignore any other field, add the CSS class `mosparo__ignored-field` to its widget:
+
+```python
+email = forms.EmailField(
+    widget=forms.EmailInput(attrs={"class": "mosparo__ignored-field"}),
+)
+```
+
+The class has to be set on the widget in the form class. A class that is only added in the template (e.g. by a template tag) isn't visible to the backend, the verification would fail.
+
+If you changed the field selector of the mosparo frontend, the backend has to send the same fields. Use `callback_after_prepare_form_data` (see below) to adjust the form data accordingly.
 
 ### Specify the connection details on the field
 
-You can also specify the connection details on the field. For that, please add the field to your form and specify the connection settings by setting the parameters `mosparo_host`, `mosparo_uuid`, `mosparo_public_key`, `mosparo_private_key`, and `mosparo_verify_ssl`. If you want to change the UUID, public or private key, you have to specify all these three values because these depend on the project and if you want to connect the field to a different project, all three values will be different.
+You can also specify the connection details on the field. For that, please add the field to your form and specify the connection settings by setting the parameters `mosparo_host`, `mosparo_uuid`, `mosparo_public_key`, `mosparo_private_key`, `mosparo_verify_ssl`, and `mosparo_timeout`. If you want to change the UUID, public or private key, you have to specify all these three values because these depend on the project and if you want to connect the field to a different project, all three values will be different.
 
 ```python
 from django import forms
@@ -116,7 +137,6 @@ from mosparo_django.fields import MosparoField
 class Form(forms.Form):
     # Your other fields...
     mosparo = MosparoField(
-        callback_ignored_field_types=None,
         callback_verifiable_field_types=None,
         callback_after_prepare_form_data=None,
     )
@@ -124,11 +144,21 @@ class Form(forms.Form):
 
 | Argument name                      | Description                                                                                                                                          |
 |------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `callback_ignored_field_types`     | Gets and returns a list of field or widget classes which should be ignored, including their subclasses (Example: `forms.PasswordInput`)             |
 | `callback_verifiable_field_types`  | Gets and returns a list of field or widget classes which are verifiable, including their subclasses (Example: `forms.TextInput`)                    |
 | `callback_after_prepare_form_data` | Gets the dict with all prepared form data, the required field names, and the verifiable field names as argument and expects the same to be returned. |
 
-Class names (e.g. `"PasswordInput"`) are still accepted in the field type lists, but they are deprecated and only match the exact class, not subclasses.
+## Upgrade from 1.x to 2.0
+
+- Python 3.10 or newer is required.
+- `mosparo-api-client` 1.2 or newer is required. Requests to mosparo now time out after 10 seconds, after which the field shows the "currently unavailable" error. Use the setting `MOSPARO_TIMEOUT` or the argument `mosparo_timeout` to change this.
+- `mosparo_django.forms.MosparoForm` was removed. Use a regular `django.forms.Form`, the `MosparoField` verifies the submission itself. Remove manual calls of `verify_data()` in `Form.clean()`, they aren't needed anymore.
+- If the verification fails, the error is attached to the mosparo field instead of the non-field errors.
+- The argument `mosparo_timeout` was added directly after `mosparo_verify_ssl` to configure the timeout of the connection to the mosparo server.
+- The argument `callback_ignored_field_types` was removed. Fields are now ignored by their rendered HTML input type (see [Fields sent to mosparo](#fields-sent-to-mosparo)). To ignore additional fields, add the CSS class `mosparo__ignored-field` to the widget.
+- A `NullBooleanField` and a `BooleanField` with a `Select` widget are now sent to mosparo, because the frontend collects them as well.
+- Fields with a `MultiWidget` or a `SelectDateWidget` are now sent with the names of their rendered inputs (e.g. `appointment_0`, `appointment_1`). Before, the verification of forms with such fields failed.
+- `callback_verifiable_field_types` only accepts field or widget classes. Class names as strings raise an `ImproperlyConfigured` error.
+- The field no longer sets the undocumented attribute `form.valid`. Use `form.is_valid()` or `form.errors` instead.
 
 ## License
 

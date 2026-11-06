@@ -1,5 +1,4 @@
 import logging
-import warnings
 import weakref
 
 import requests
@@ -14,6 +13,19 @@ from mosparo_django.widgets import MosparoWidget
 
 logger = logging.getLogger(__name__)
 
+# The mosparo frontend doesn't collect inputs of these types.
+SKIPPED_INPUT_TYPES = frozenset({"submit", "reset", "button"})
+
+# The mosparo frontend collects inputs of these types as ignored fields, so
+# they aren't part of the verified form data.
+IGNORED_INPUT_TYPES = frozenset({"password", "file", "hidden", "checkbox", "radio"})
+
+# Fields with this class are ignored additionally.
+IGNORED_FIELD_CLASS = "mosparo__ignored-field"
+
+# The timeout in seconds for the requests to mosparo.
+DEFAULT_TIMEOUT = 10
+
 
 class MosparoField(forms.BooleanField):
     widget = MosparoWidget
@@ -23,8 +35,8 @@ class MosparoField(forms.BooleanField):
     mosparo_public_key = None
     mosparo_private_key = None
     mosparo_verify_ssl = True
+    mosparo_timeout = DEFAULT_TIMEOUT
 
-    callback_ignored_field_types = None
     callback_verifiable_field_types = None
     callback_after_prepare_form_data = None
 
@@ -39,7 +51,7 @@ class MosparoField(forms.BooleanField):
         mosparo_public_key=None,
         mosparo_private_key=None,
         mosparo_verify_ssl=None,
-        callback_ignored_field_types=None,
+        mosparo_timeout=None,
         callback_verifiable_field_types=None,
         callback_after_prepare_form_data=None,
         *args,
@@ -67,13 +79,16 @@ class MosparoField(forms.BooleanField):
         if mosparo_verify_ssl is None:
             mosparo_verify_ssl = getattr(settings, "MOSPARO_VERIFY_SSL", True)
 
+        if mosparo_timeout is None:
+            mosparo_timeout = getattr(settings, "MOSPARO_TIMEOUT", DEFAULT_TIMEOUT)
+
         self.mosparo_host = mosparo_host
         self.mosparo_uuid = mosparo_uuid
         self.mosparo_public_key = mosparo_public_key
         self.mosparo_private_key = mosparo_private_key
         self.mosparo_verify_ssl = mosparo_verify_ssl
+        self.mosparo_timeout = mosparo_timeout
 
-        self.callback_ignored_field_types = callback_ignored_field_types
         self.callback_verifiable_field_types = callback_verifiable_field_types
         self.callback_after_prepare_form_data = callback_after_prepare_form_data
 
@@ -107,8 +122,8 @@ class MosparoField(forms.BooleanField):
         return value
 
     def verify_data(self, form: forms.Form):
-        # The submission can only be verified once, clean() and the legacy
-        # verification in Form.clean() would otherwise both hit the API.
+        # A submission can only be verified once, so the result is remembered
+        # for this form instance (e.g. when full_clean() is called again).
         if self._verified_form is not None and self._verified_form() is form:
             if self._verification_error is not None:
                 raise self._verification_error
@@ -121,7 +136,6 @@ class MosparoField(forms.BooleanField):
             # isn't a verification result, so it isn't remembered and a later
             # validation of the form asks mosparo again.
             logger.exception("The submission could not be verified with mosparo.")
-            form.valid = False
 
             raise ValidationError(
                 _(
@@ -143,6 +157,7 @@ class MosparoField(forms.BooleanField):
             self.mosparo_public_key,
             self.mosparo_private_key,
             self.mosparo_verify_ssl,
+            timeout=self.mosparo_timeout,
         )
 
         if (
@@ -176,10 +191,8 @@ class MosparoField(forms.BooleanField):
                 and not required_field_difference
                 and not verifiable_field_difference
             ):
-                form.valid = True
                 return
 
-        form.valid = False
         raise ValidationError(_("The spam protection could not verify the data."))
 
     def get_mosparo_host(self):
@@ -193,21 +206,6 @@ class MosparoField(forms.BooleanField):
 
     def prepare_form_data(self, form: forms.Form):
         data = {"form_data": {}, "required_fields": [], "verifiable_fields": []}
-        ignored_field_types = [
-            forms.BooleanField,
-            forms.NullBooleanSelect,
-            forms.CheckboxInput,
-            forms.RadioSelect,
-            forms.CheckboxSelectMultiple,
-            forms.PasswordInput,
-            forms.HiddenInput,
-            forms.MultipleHiddenInput,
-            forms.FileInput,
-            forms.ClearableFileInput,
-            MosparoField,
-        ]
-        if self.callback_ignored_field_types is not None:
-            ignored_field_types = self.callback_ignored_field_types(ignored_field_types)
 
         verifiable_field_types = [
             forms.TextInput,
@@ -220,26 +218,36 @@ class MosparoField(forms.BooleanField):
                 verifiable_field_types
             )
 
+        verifiable_field_types = _to_type_tuple(verifiable_field_types)
+
         for key, field in form.fields.items():
-            if _matches_field_types(field, ignored_field_types):
+            # The mosparo field itself renders no input which the frontend collects.
+            if isinstance(field, MosparoField):
                 continue
 
-            if (
-                "class" in field.widget.attrs
-                and "mosparo__ignored-field" in field.widget.attrs["class"]
-            ):
-                continue
+            is_verifiable = isinstance(field, verifiable_field_types) or isinstance(
+                field.widget, verifiable_field_types
+            )
 
             name = form.add_prefix(key)
 
-            if field.required:
-                data["required_fields"].append(name)
+            # A widget can render several inputs, e.g. a MultiWidget renders "name_0" and "name_1".
+            # The frontend collects each of them.
+            for name, input_type, attrs in _rendered_inputs(form[key]):
+                if _is_ignored_input(input_type, attrs):
+                    continue
 
-            if _matches_field_types(field, verifiable_field_types):
-                data["verifiable_fields"].append(name)
+                if field.required:
+                    data["required_fields"].append(name)
 
-            if name in form.data:
-                data["form_data"][name] = form.data[name]
+                if is_verifiable:
+                    data["verifiable_fields"].append(name)
+
+                if _is_multiple_select(input_type, attrs):
+                    # The frontend sends the selected options of a <select multiple> as a list, even if none is selected.
+                    data["form_data"][name] = _get_list(form.data, name)
+                elif name in form.data:
+                    data["form_data"][name] = form.data[name]
 
         if self.callback_after_prepare_form_data is not None:
             data = self.callback_after_prepare_form_data(data)
@@ -247,17 +255,71 @@ class MosparoField(forms.BooleanField):
         return data
 
 
-def _matches_field_types(field, field_types):
+def _rendered_inputs(bound_field):
+    """
+    Yields the name, the input type and the attributes of each input which the bound field renders.
+    The widget context is built like when the field is rendered, so that the result matches the
+    HTML which the frontend sees.
+    """
+    widget = bound_field.field.widget
+    attrs = bound_field.build_widget_attrs({}, widget)
+
+    if bound_field.auto_id and "id" not in widget.attrs:
+        attrs["id"] = bound_field.auto_id
+
+    context = widget.get_context(bound_field.html_name, bound_field.value(), attrs)
+
+    yield from _walk_widget_context(context["widget"])
+
+
+def _walk_widget_context(context):
+    # MultiWidget and SelectDateWidget render one input per subwidget.
+    if context.get("subwidgets"):
+        for subwidget in context["subwidgets"]:
+            yield from _walk_widget_context(subwidget)
+        return
+
+    input_type = context.get("type")
+    if input_type is None:
+        # Choice widgets (e.g. RadioSelect) store the type on their options.
+        for _group_name, options, _index in context.get("optgroups", ()):
+            if options:
+                input_type = options[0].get("type")
+                break
+
+    yield context["name"], input_type, context["attrs"]
+
+
+def _is_ignored_input(input_type, attrs):
+    """
+    Returns True if the input must not be sent to mosparo. This has to match the inputs which the
+    mosparo frontend ignores in the rendered form, otherwise the verification fails.
+    """
+    if input_type in SKIPPED_INPUT_TYPES or input_type in IGNORED_INPUT_TYPES:
+        return True
+
+    return IGNORED_FIELD_CLASS in str(attrs.get("class", "")).split()
+
+
+def _is_multiple_select(input_type, attrs):
+    # Inputs have a type in their context, a <select> only on its options.
+    return input_type in (None, "select") and bool(attrs.get("multiple"))
+
+
+def _get_list(form_data, name):
+    # Like SelectMultiple.value_from_datadict(), form.data can be a QueryDict or a plain dict.
+    if hasattr(form_data, "getlist"):
+        return form_data.getlist(name)
+
+    value = form_data.get(name, [])
+    return list(value) if isinstance(value, (list, tuple)) else [value]
+
+
+def _to_type_tuple(field_types):
     for field_type in field_types:
-        if isinstance(field_type, str):
-            warnings.warn(
-                f"Field types should be classes, not names. Replace {field_type!r}"
-                " with the field or widget class.",
-                DeprecationWarning,
-                stacklevel=3,
+        if not isinstance(field_type, type):
+            raise ImproperlyConfigured(
+                f"Field types must be field or widget classes, got {field_type!r}."
             )
-            if field_type in (type(field).__name__, type(field.widget).__name__):
-                return True
-        elif isinstance(field, field_type) or isinstance(field.widget, field_type):
-            return True
-    return False
+
+    return tuple(field_types)

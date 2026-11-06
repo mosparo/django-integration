@@ -5,10 +5,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: mosparo_django 1.0\n"
+"Project-Id-Version: mosparo_django 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-24 18:09+0200\n"
-"PO-Revision-Date: 2026-10-24 18:09+0200\n"
+"POT-Creation-Date: 2026-11-02 19:59+0100\n"
+"PO-Revision-Date: 2026-11-02 19:59+0100\n"
 "Last-Translator: Matthias Zobrist <info@mosparo.io>\n"
 "Language-Team: \n"
 "Language: \n"
@@ -17,20 +17,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: fields.py:128
+#: fields.py:134
 msgid "The spam protection is currently unavailable. Please try again later."
 msgstr ""
 
-#: fields.py:153
+#: fields.py:159
 msgid "mosparo specific fields were not found in the submitted data."
 msgstr ""
 
-#: fields.py:183
+#: fields.py:189
 msgid "The spam protection could not verify the data."
-msgstr ""
-
-#: forms.py:13
-msgid "No mosparo field found in form."
 msgstr ""
 
 #: templates/mosparo/box.html:1
